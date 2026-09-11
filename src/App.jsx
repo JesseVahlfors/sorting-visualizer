@@ -6,7 +6,7 @@ import ControlsArea from "./components/ControlsArea";
 function App() {
   return (
     <>
-      <div>
+      <div className="main">
         <Header />
         <VisualizationArea />
         <ControlsArea />
