@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import usePlayback from "../hooks/usePlayback";
 
 function VisualizationArea() {
   const [array, setArray] = useState(createRandomArray);
-  const [steps, setSteps] = useState([]);
-  const [currentStep, setCurrentStep] = useState(0);
   const [displayArray, setDisplayArray] = useState(array);
   const [activeIndices, setActiveIndices] = useState([]);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [sortedIndices, setSortedIndices] = useState([]);
+  const { steps, currentStep, isPlaying, loadSteps, play, advanceStep, reset } =
+    usePlayback(applyOperation);
   const [error, setError] = useState("");
-  const showDebugControls = false;
+  const showDebugControls = true;
 
   function createRandomArray() {
     const newArray = [];
@@ -22,13 +23,16 @@ function VisualizationArea() {
 
   function generateArray() {
     setError("");
+
     const newArray = createRandomArray();
+
     setArray(newArray);
     setDisplayArray(newArray);
-    setSteps([]);
-    setCurrentStep(0);
+
+    reset();
+
     setActiveIndices([]);
-    setIsPlaying(false);
+    setSortedIndices([]);
   }
 
   function handleSort() {
@@ -48,12 +52,12 @@ function VisualizationArea() {
         return response.json();
       })
       .then((data) => {
-        setSteps(data.steps);
-        setCurrentStep(0);
+        loadSteps(data.steps);
         setDisplayArray([...array]);
         setActiveIndices([]);
+        setSortedIndices([]);
         if (!showDebugControls) {
-          setIsPlaying(true);
+          play();
         }
       })
       .catch((error) => {
@@ -61,15 +65,7 @@ function VisualizationArea() {
       });
   }
 
-  function stepHandler() {
-    if (currentStep >= steps.length) {
-      setIsPlaying(false);
-      setActiveIndices([]);
-      return;
-    }
-
-    const step = steps[currentStep];
-
+  function applyOperation(step) {
     if (step.type === "compare") {
       setActiveIndices(step.indices);
     }
@@ -84,26 +80,13 @@ function VisualizationArea() {
 
         return next;
       });
-
       setActiveIndices(step.indices);
     }
 
-    setCurrentStep((prev) => prev + 1);
+    if (step.type === "sorted") {
+      setSortedIndices((prev) => [...prev, ...step.indices]);
+    }
   }
-
-  function playHandler() {
-    setIsPlaying(true);
-  }
-
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const timer = setTimeout(() => {
-      stepHandler();
-    }, 150);
-
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStep]);
 
   return (
     <div>
@@ -113,11 +96,9 @@ function VisualizationArea() {
           ? displayArray.map((value, index) => (
               <div
                 key={index}
-                className={
-                  activeIndices.includes(index) && isPlaying
-                    ? "bar active"
-                    : "bar"
-                }
+                className={`bar ${
+                  activeIndices.includes(index) ? "active" : ""
+                } ${sortedIndices.includes(index) ? "sorted" : ""}`}
                 style={{ height: `${value * 20}px` }}
               >
                 {value}
@@ -128,9 +109,7 @@ function VisualizationArea() {
       {steps.length > 0 && currentStep < steps.length && (
         <div>
           <p>{steps[currentStep].type}</p>
-          <p>
-            {steps[currentStep].indices[0]} and {steps[currentStep].indices[1]}
-          </p>
+          <p>{steps[currentStep].indices.join(", ")}</p>
         </div>
       )}
       <button onClick={generateArray} disabled={isPlaying}>
@@ -142,12 +121,12 @@ function VisualizationArea() {
       {showDebugControls && (
         <>
           <button
-            onClick={stepHandler}
+            onClick={advanceStep}
             disabled={steps.length === 0 || currentStep >= steps.length}
           >
             Advance Step
           </button>
-          <button onClick={playHandler}>Play</button>
+          <button onClick={play}>Play</button>
         </>
       )}
     </div>

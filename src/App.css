@@ -19,3 +19,7 @@
 .bar.active {
   outline: 3px solid orange;
 }
+
+.bar.sorted {
+  background:greenyellow;
+}
