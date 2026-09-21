@@ -22,7 +22,7 @@ function VisualizationArea() {
 
   function generateArray() {
     setError("");
-    const newArray = createRandomArray;
+    const newArray = createRandomArray();
     setArray(newArray);
     setDisplayArray(newArray);
     setSteps([]);
@@ -38,9 +38,7 @@ function VisualizationArea() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        array: array,
-      }),
+      body: JSON.stringify({ array }),
     })
       .then((response) => {
         if (!response.ok) {
