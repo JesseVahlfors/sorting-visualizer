@@ -1,16 +1,91 @@
-# React + Vite
+# Sorting Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive sorting algorithm visualizer built with **React** and **Django REST Framework**.
 
-Currently, two official plugins are available:
+The project visualizes sorting algorithms step by step. Sorting is performed by the Django backend, which returns a sequence of generic operations that the React frontend replays as an animation.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Current Features
 
-## React Compiler
+- Bubble Sort
+- Selection Sort
+- Step-by-step sorting visualization
+- Play and pause controls
+- Adjustable playback speed
+- Generate random arrays
+- Switch between sorting algorithms
+- Shared operation protocol for different algorithms
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Architecture
 
-## Expanding the ESLint configuration
+The React frontend sends an array and selected algorithm to a generic Django API endpoint.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+React
+  │
+  │  POST /api/sorting/sort/
+  │
+  │  {
+  │    "array": [...],
+  │    "algorithm": "selection"
+  │  }
+  ▼
+Django REST API
+  │
+  ├── validates the request
+  ├── selects the requested algorithm
+  └── generates sorting operations
+          │
+          ▼
+React playback system
+  │
+  └── replays the operations as an animation
+```
+
+The frontend does not implement algorithm-specific playback logic. Each backend sorting algorithm produces operations using a shared protocol such as:
+
+```text
+compare
+swap
+sorted
+```
+
+This allows different sorting algorithms to use the same React visualization and playback system.
+
+### Backend
+
+This repository contains the React frontend for the Sorting Visualizer.
+
+The Django REST API and sorting algorithm implementations are part of my portfolio backend:
+
+**Backend repository:** [Portfolio](https://github.com/JesseVahlfors/Portfolio_project)
+
+## Tech Stack
+
+**Frontend**
+- React
+- Vite
+- JavaScript
+
+**Backend**
+- Python
+- Django
+- Django REST Framework
+
+## Planned Features
+
+- Additional sorting algorithms
+  - Insertion Sort
+  - Merge Sort
+  - Quick Sort
+- Support for additional visualization operations such as value writes
+- Multiple sorting visualizations running side by side
+- Compare algorithms using the same starting array
+- Algorithm statistics such as comparisons and swaps
+- Improved visualization and controls
+- Deployment as part of my portfolio
+
+## Project Status
+
+Work in progress.
+
+The current implementation supports Bubble Sort and Selection Sort through a reusable backend operation protocol and a shared React playback system.
