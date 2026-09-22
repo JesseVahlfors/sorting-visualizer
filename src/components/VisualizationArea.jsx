@@ -7,6 +7,7 @@ function VisualizationArea() {
   const [displayArray, setDisplayArray] = useState(array);
   const [activeIndices, setActiveIndices] = useState([]);
   const [sortedIndices, setSortedIndices] = useState([]);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
   const [error, setError] = useState("");
   const showDebugControls = false;
 
@@ -78,12 +79,12 @@ function VisualizationArea() {
 
   function handleSort() {
     setError("");
-    fetch("http://127.0.0.1:8000/api/sorting/bubble-sort/", {
+    fetch("http://127.0.0.1:8000/api/sorting/sort/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ array }),
+      body: JSON.stringify({ array, algorithm: selectedAlgorithm }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -150,6 +151,8 @@ function VisualizationArea() {
         setSpeed={setSpeed}
         handleSort={handleSort}
         generateArray={generateArray}
+        selectedAlgorithm={selectedAlgorithm}
+        setSelectedAlgorithm={setSelectedAlgorithm}
       />
     </div>
   );
