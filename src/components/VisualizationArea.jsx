@@ -1,15 +1,56 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import usePlayback from "../hooks/usePlayback";
+import ControlsArea from "./ControlsArea";
 
 function VisualizationArea() {
   const [array, setArray] = useState(createRandomArray);
   const [displayArray, setDisplayArray] = useState(array);
   const [activeIndices, setActiveIndices] = useState([]);
   const [sortedIndices, setSortedIndices] = useState([]);
-  const { steps, currentStep, isPlaying, loadSteps, play, advanceStep, reset } =
-    usePlayback(applyOperation);
   const [error, setError] = useState("");
-  const showDebugControls = true;
+  const showDebugControls = false;
+
+  const applyOperation = useCallback(
+    (step) => {
+      if (step.type === "compare") {
+        setActiveIndices(step.indices);
+      }
+
+      if (step.type === "swap") {
+        setDisplayArray((prev) => {
+          const next = [...prev];
+
+          const [a, b] = step.indices;
+
+          [next[a], next[b]] = [next[b], next[a]];
+
+          return next;
+        });
+        setActiveIndices(step.indices);
+      }
+
+      if (step.type === "sorted") {
+        setSortedIndices((prev) => [...prev, ...step.indices]);
+      }
+    },
+    [setActiveIndices, setDisplayArray, setSortedIndices],
+  );
+
+  const {
+    steps,
+    currentStep,
+    isPlaying,
+    loadSteps,
+    play,
+    advanceStep,
+    reset,
+    pause,
+    speed,
+    setSpeed,
+  } = usePlayback(applyOperation);
+
+  const canPlay = steps.length > 0 && currentStep < steps.length;
+  const canSort = !isPlaying && array.length > 0;
 
   function createRandomArray() {
     const newArray = [];
@@ -65,29 +106,6 @@ function VisualizationArea() {
       });
   }
 
-  function applyOperation(step) {
-    if (step.type === "compare") {
-      setActiveIndices(step.indices);
-    }
-
-    if (step.type === "swap") {
-      setDisplayArray((prev) => {
-        const next = [...prev];
-
-        const [a, b] = step.indices;
-
-        [next[a], next[b]] = [next[b], next[a]];
-
-        return next;
-      });
-      setActiveIndices(step.indices);
-    }
-
-    if (step.type === "sorted") {
-      setSortedIndices((prev) => [...prev, ...step.indices]);
-    }
-  }
-
   return (
     <div>
       <h2>Visualization</h2>
@@ -106,18 +124,12 @@ function VisualizationArea() {
             ))
           : error}
       </div>
-      {steps.length > 0 && currentStep < steps.length && (
+      {steps.length > 0 && currentStep < steps.length && showDebugControls && (
         <div>
           <p>{steps[currentStep].type}</p>
           <p>{steps[currentStep].indices.join(", ")}</p>
         </div>
       )}
-      <button onClick={generateArray} disabled={isPlaying}>
-        Generate Array
-      </button>
-      <button onClick={handleSort} disabled={isPlaying || array.length === 0}>
-        Sort
-      </button>
       {showDebugControls && (
         <>
           <button
@@ -126,9 +138,19 @@ function VisualizationArea() {
           >
             Advance Step
           </button>
-          <button onClick={play}>Play</button>
         </>
       )}
+      <ControlsArea
+        isPlaying={isPlaying}
+        play={play}
+        pause={pause}
+        canPlay={canPlay}
+        canSort={canSort}
+        speed={speed}
+        setSpeed={setSpeed}
+        handleSort={handleSort}
+        generateArray={generateArray}
+      />
     </div>
   );
 }

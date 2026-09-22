@@ -1,11 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+
+const speedDelays = {
+  slow: 400,
+  normal: 150,
+  fast: 50,
+};
 
 function usePlayback(applyOperation) {
   const [steps, setSteps] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState("normal");
 
-  function advanceStep() {
+  const advanceStep = useCallback(() => {
     if (currentStep >= steps.length) {
       setIsPlaying(false);
       return;
@@ -16,7 +23,11 @@ function usePlayback(applyOperation) {
     applyOperation(step);
 
     setCurrentStep((prev) => prev + 1);
-  }
+
+    if (currentStep === steps.length - 1) {
+      setIsPlaying(false);
+    }
+  }, [applyOperation, steps, currentStep]);
 
   function play() {
     setIsPlaying(true);
@@ -42,9 +53,9 @@ function usePlayback(applyOperation) {
 
     const timer = setTimeout(() => {
       advanceStep();
-    }, 150);
+    }, speedDelays[speed]);
     return () => clearTimeout(timer);
-  }, [isPlaying, currentStep]);
+  }, [isPlaying, speed, advanceStep]);
 
   return {
     steps,
@@ -55,6 +66,8 @@ function usePlayback(applyOperation) {
     pause,
     advanceStep,
     reset,
+    speed,
+    setSpeed,
   };
 }
 
