@@ -12,16 +12,16 @@ function ControlsArea({
   setSelectedAlgorithm,
 }) {
   return (
-    <div>
+    <div className="controls-area">
       {/* need to capitalize in css */}
       <h2>{selectedAlgorithm} sort</h2>
-      <h3>Controls</h3>
       <select
         value={selectedAlgorithm}
         onChange={(event) => setSelectedAlgorithm(event.target.value)}
       >
         <option value="bubble">Bubble Sort</option>
         <option value="selection">Selection Sort</option>
+        <option value="insertion">Insertion Sort</option>
       </select>
       <button onClick={generateArray} disabled={isPlaying}>
         Generate Array

@@ -2,24 +2,167 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .visualizer {
+  padding-top: 220px;
+}
+
+.bars {
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   gap: 8px;
-  height: 300px;
+  height: 220px;
+  padding: 0 1rem 1rem;
+
+  border-bottom: 2px solid #475569;
+}
+
+.bar-slot {
+  position: relative;
+
+  display: flex;
+  align-items: flex-end;
+
+  width: 40px;
+  height: 100%;
 }
 
 .bar {
   width: 40px;
-  background: steelblue;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding-top: 6px;
+
+  background: #3b82f6;
+  border-radius: 5px 5px 2px 2px;
+
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  transition:
+    height 150ms ease,
+    background-color 150ms ease,
+    opacity 150ms ease;
 }
 
 .bar.active {
-  outline: 3px solid orange;
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
 }
 
 .bar.sorted {
-  background:greenyellow;
+  background: #22c55e;
+}
+
+.bar.gap {
+  opacity: 0;
+}
+
+.bar.held-key {
+  position: absolute;
+
+  left: 0;
+  bottom: calc(100% + 20px);
+
+  background: #a855f7;
+  outline: 3px solid #c084fc;
+  outline-offset: 2px;
+
+  z-index: 2;
+}
+
+.controls-area {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  width: fit-content;
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+}
+
+.controls-area h2 {
+  width: 100%;
+  margin: 0;
+
+  text-align: center;
+  text-transform: capitalize;
+  font-size: 1.4rem;
+  color: #f8fafc;
+}
+
+.controls-area h3 {
+  width: 100%;
+  margin: 0 0 0.5rem;
+
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.controls-area button,
+.controls-area select {
+  min-height: 40px;
+  padding: 0.6rem 1rem;
+
+  border: 1px solid #475569;
+  border-radius: 7px;
+
+  background: #334155;
+  color: #f8fafc;
+
+  font: inherit;
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 100ms ease;
+}
+
+.controls-area button:hover:not(:disabled),
+.controls-area select:hover {
+  background: #475569;
+  border-color: #64748b;
+}
+
+.controls-area button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.controls-area button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.controls-area select {
+  appearance: auto;
+}
+
+.controls-area button:focus-visible,
+.controls-area select:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
