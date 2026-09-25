@@ -11,6 +11,7 @@ function VisualizationArea() {
   const [heldKey, setHeldKey] = useState(null);
   const [gapIndex, setGapIndex] = useState(null);
   const [error, setError] = useState("");
+  const [barDepth, setBarDepth] = useState([]);
   const showDebugControls = false;
 
   const applyOperation = useCallback(
@@ -34,6 +35,7 @@ function VisualizationArea() {
 
       if (step.type === "sorted") {
         setSortedIndices((prev) => [...prev, ...step.indices]);
+        setActiveIndices([]);
       }
 
       if (step.type === "hold") {
@@ -60,6 +62,27 @@ function VisualizationArea() {
           return next;
         });
       }
+
+      if (step.type === "move") {
+        setDisplayArray((prev) => {
+          const next = [...prev];
+          const removed = next.splice(step.from, 1);
+          next.splice(step.to, 0, ...removed);
+          return next;
+        });
+
+        setActiveIndices([step.to, step.to + 1]);
+      }
+
+      if (step.type === "group") {
+        setBarDepth((prev) => {
+          const next = [...prev];
+          for (let i = step.start; i < step.start + step.length; i++) {
+            next[i] = step.depth;
+          }
+          return next;
+        });
+      }
     },
     [
       setActiveIndices,
@@ -67,6 +90,7 @@ function VisualizationArea() {
       setSortedIndices,
       setHeldKey,
       setGapIndex,
+      setBarDepth,
     ],
   );
 
@@ -88,8 +112,9 @@ function VisualizationArea() {
 
   function createRandomArray() {
     const newArray = [];
+    const arrayLength = Math.floor(Math.random() * 11) + 5;
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < arrayLength; i++) {
       newArray.push(Math.floor(Math.random() * 10) + 1);
     }
 
@@ -110,6 +135,7 @@ function VisualizationArea() {
     setSortedIndices([]);
     setGapIndex(null);
     setHeldKey(null);
+    setBarDepth(newArray.map(() => 0));
   }
 
   function handleSort() {
@@ -131,6 +157,7 @@ function VisualizationArea() {
       .then((data) => {
         loadSteps(data.steps);
         setDisplayArray([...array]);
+        setBarDepth(array.map(() => 0));
         setActiveIndices([]);
         setSortedIndices([]);
         setGapIndex(null);
@@ -151,7 +178,13 @@ function VisualizationArea() {
         <div className="bars">
           {!error
             ? displayArray.map((value, index) => (
-                <div className="bar-slot" key={index}>
+                <div
+                  className="bar-slot"
+                  key={index}
+                  style={{
+                    transform: `translateY(${-barDepth[index] * 40}px)`,
+                  }}
+                >
                   <div
                     className={`bar
               ${activeIndices.includes(index) ? "active" : ""}

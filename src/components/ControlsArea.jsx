@@ -22,6 +22,7 @@ function ControlsArea({
         <option value="bubble">Bubble Sort</option>
         <option value="selection">Selection Sort</option>
         <option value="insertion">Insertion Sort</option>
+        <option value="merge">Merge Sort</option>
       </select>
       <button onClick={generateArray} disabled={isPlaying}>
         Generate Array
