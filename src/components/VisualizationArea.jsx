@@ -12,76 +12,93 @@ function VisualizationArea() {
   const [gapIndex, setGapIndex] = useState(null);
   const [error, setError] = useState("");
   const [barDepth, setBarDepth] = useState([]);
+  const [pivotIndex, setPivotIndex] = useState(null);
   const showDebugControls = false;
 
   const applyOperation = useCallback(
     (step) => {
-      if (step.type === "compare") {
-        setActiveIndices(step.indices);
-      }
+      switch (step.type) {
+        case "compare":
+          setActiveIndices(step.indices);
+          break;
 
-      if (step.type === "swap") {
-        setDisplayArray((prev) => {
-          const next = [...prev];
+        case "swap":
+          setDisplayArray((prev) => {
+            const next = [...prev];
 
-          const [a, b] = step.indices;
+            const [a, b] = step.indices;
 
-          [next[a], next[b]] = [next[b], next[a]];
+            [next[a], next[b]] = [next[b], next[a]];
 
-          return next;
-        });
-        setActiveIndices(step.indices);
-      }
+            return next;
+          });
 
-      if (step.type === "sorted") {
-        setSortedIndices((prev) => [...prev, ...step.indices]);
-        setActiveIndices([]);
-      }
+          setActiveIndices(step.indices);
+          break;
 
-      if (step.type === "hold") {
-        setGapIndex(step.index);
-        setHeldKey({
-          value: step.value,
-          index: step.index,
-        });
-      }
+        case "sorted":
+          setSortedIndices((prev) => [...prev, ...step.indices]);
+          setActiveIndices([]);
+          break;
 
-      if (step.type === "release") {
-        setHeldKey(null);
-        setGapIndex(null);
-      }
+        case "hold":
+          setHeldKey(step.value);
+          break;
 
-      if (step.type === "write") {
-        setDisplayArray((prev) => {
-          const next = [...prev];
+        case "gap":
+          setGapIndex(step.index);
+          break;
 
-          next[step.index] = step.value;
+        case "ungap":
+          setGapIndex(null);
+          break;
 
-          setGapIndex(step.gap);
+        case "release":
+          setHeldKey(null);
+          break;
 
-          return next;
-        });
-      }
+        case "write":
+          setDisplayArray((prev) => {
+            const next = [...prev];
 
-      if (step.type === "move") {
-        setDisplayArray((prev) => {
-          const next = [...prev];
-          const removed = next.splice(step.from, 1);
-          next.splice(step.to, 0, ...removed);
-          return next;
-        });
+            next[step.index] = step.value;
 
-        setActiveIndices([step.to, step.to + 1]);
-      }
+            return next;
+          });
+          break;
 
-      if (step.type === "group") {
-        setBarDepth((prev) => {
-          const next = [...prev];
-          for (let i = step.start; i < step.start + step.length; i++) {
-            next[i] = step.depth;
-          }
-          return next;
-        });
+        case "move":
+          setDisplayArray((prev) => {
+            const next = [...prev];
+            const removed = next.splice(step.from, 1);
+            next.splice(step.to, 0, ...removed);
+            return next;
+          });
+
+          setActiveIndices([step.to]);
+          break;
+
+        case "group":
+          setBarDepth((prev) => {
+            const next = [...prev];
+            for (let i = step.start; i < step.start + step.length; i++) {
+              next[i] = step.depth;
+            }
+            return next;
+          });
+          break;
+
+        case "pivot":
+          setPivotIndex(step.index);
+          break;
+
+        case "unpivot":
+          setPivotIndex(null);
+          break;
+
+        default:
+          console.warn("Unknown operation type:", step.type);
+          break;
       }
     },
     [
@@ -91,6 +108,7 @@ function VisualizationArea() {
       setHeldKey,
       setGapIndex,
       setBarDepth,
+      setPivotIndex,
     ],
   );
 
@@ -112,7 +130,7 @@ function VisualizationArea() {
 
   function createRandomArray() {
     const newArray = [];
-    const arrayLength = Math.floor(Math.random() * 11) + 5;
+    const arrayLength = Math.floor(Math.random() * 25) + 5;
 
     for (let i = 0; i < arrayLength; i++) {
       newArray.push(Math.floor(Math.random() * 10) + 1);
@@ -136,6 +154,7 @@ function VisualizationArea() {
     setGapIndex(null);
     setHeldKey(null);
     setBarDepth(newArray.map(() => 0));
+    setPivotIndex(null);
   }
 
   function handleSort() {
@@ -162,6 +181,7 @@ function VisualizationArea() {
         setSortedIndices([]);
         setGapIndex(null);
         setHeldKey(null);
+        setPivotIndex(null);
         if (!showDebugControls) {
           play();
         }
@@ -190,6 +210,7 @@ function VisualizationArea() {
               ${activeIndices.includes(index) ? "active" : ""}
               ${sortedIndices.includes(index) ? "sorted" : ""}
               ${gapIndex === index ? "gap" : ""}
+              ${pivotIndex === index ? "pivot" : ""}
             `}
                     style={{ height: `${value * 20}px` }}
                   >
@@ -199,9 +220,9 @@ function VisualizationArea() {
                   {heldKey !== null && gapIndex === index && (
                     <div
                       className="bar held-key"
-                      style={{ height: `${heldKey.value * 20}px` }}
+                      style={{ height: `${heldKey * 20}px` }}
                     >
-                      {heldKey.value}
+                      {heldKey}
                     </div>
                   )}
                 </div>
