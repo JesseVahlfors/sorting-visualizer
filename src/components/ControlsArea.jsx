@@ -1,40 +1,21 @@
 function ControlsArea({
+  onSort,
   isPlaying,
   play,
   pause,
-  canPlay,
-  canSort,
   speed,
   setSpeed,
   generateArray,
-  handleSort,
-  selectedAlgorithm,
-  setSelectedAlgorithm,
+  canPlay,
 }) {
   return (
     <div className="controls-area">
-      {/* need to capitalize in css */}
-      <h2>{selectedAlgorithm} sort</h2>
-      <select
-        value={selectedAlgorithm}
-        onChange={(event) => setSelectedAlgorithm(event.target.value)}
-      >
-        <option value="bubble">Bubble Sort</option>
-        <option value="selection">Selection Sort</option>
-        <option value="insertion">Insertion Sort</option>
-        <option value="merge">Merge Sort</option>
-        <option value="quick">Quick Sort</option>
-      </select>
       <button onClick={generateArray} disabled={isPlaying}>
         Generate Array
       </button>
-      <button onClick={handleSort} disabled={!canSort}>
-        Sort
-      </button>
+      <button onClick={onSort}>Sort</button>
       {isPlaying ? (
-        <button onClick={pause} disabled={!canPlay}>
-          Pause
-        </button>
+        <button onClick={pause}>Pause</button>
       ) : (
         <button onClick={play} disabled={!canPlay}>
           Play
