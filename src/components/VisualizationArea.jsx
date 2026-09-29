@@ -21,7 +21,7 @@ function VisualizationArea() {
   const [speed, setSpeed] = useState("normal");
   const [isCardReady, setIsCardReady] = useState(false);
   // Ref used to call the small command interface exposed by AlgorithmCard.
-  const algorithmCardRef = useRef();
+  const algorithmCardRef = useRef([]);
 
   function createRandomArray() {
     const newArray = [];
@@ -53,17 +53,22 @@ function VisualizationArea() {
     setIsPlaying(false);
   }
 
+  const cards = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
+
   return (
     <div className="visualization-area">
-      <AlgorithmCard
-        ref={algorithmCardRef}
-        array={array}
-        isPlaying={isPlaying}
-        speed={speed}
-        onComplete={handleCardComplete}
-        onReady={handleCardReady}
-        onAlgorithmChange={handleAlgorithmChange}
-      />
+      {cards.map((card) => (
+        <AlgorithmCard
+          key={card.id}
+          ref={algorithmCardRef}
+          array={array}
+          isPlaying={isPlaying}
+          speed={speed}
+          onComplete={handleCardComplete}
+          onReady={handleCardReady}
+          onAlgorithmChange={handleAlgorithmChange}
+        />
+      ))}
       <ControlsArea
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
