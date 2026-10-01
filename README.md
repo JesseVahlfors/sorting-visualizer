@@ -113,19 +113,18 @@ When the sorting animation is complete you can reset the array with Sort button.
 
 The application currently only works with one visualization.
 
-To stop the development servers use `CTRL - C` while in their respective terminals in django and Vite. 
-
-
-
+To stop the development servers use `CTRL - C` while in their respective terminals in django and Vite.
 
 ## Tech Stack
 
 **Frontend**
+
 - React
 - Vite
 - JavaScript
 
 **Backend**
+
 - Python
 - Django
 - Django REST Framework

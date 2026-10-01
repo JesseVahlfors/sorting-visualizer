@@ -20,8 +20,7 @@ function VisualizationArea() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState("normal");
   const [isCardReady, setIsCardReady] = useState(false);
-  // Ref used to call the small command interface exposed by AlgorithmCard.
-  const algorithmCardRef = useRef([]);
+  const algorithmCardRefs = useRef({});
 
   function createRandomArray() {
     const newArray = [];
@@ -38,11 +37,15 @@ function VisualizationArea() {
     const newArray = createRandomArray();
     setArray(newArray);
     setIsCardReady(false);
-    algorithmCardRef.current?.resetVisualization(newArray);
+    Object.values(algorithmCardRefs.current).forEach((handle) => {
+      handle?.resetVisualization(newArray);
+    });
   }
 
   function loadSorts() {
-    algorithmCardRef.current?.loadSort();
+    Object.values(algorithmCardRefs.current).forEach((handle) => {
+      handle?.loadSort();
+    });
   }
 
   function play() {
@@ -60,7 +63,9 @@ function VisualizationArea() {
       {cards.map((card) => (
         <AlgorithmCard
           key={card.id}
-          ref={algorithmCardRef}
+          ref={(handle) => {
+            algorithmCardRefs.current[card.id] = handle;
+          }}
           array={array}
           isPlaying={isPlaying}
           speed={speed}
